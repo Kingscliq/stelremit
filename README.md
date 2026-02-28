@@ -47,8 +47,15 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 5. **Success**: The app will display the transaction hash and update your balance upon success!
 
 ## Screenshots
-_Please add your local screenshots to the `public/` directory or README images folder here demonstrating:_
-1. Wallet connected state
-2. Balance displayed
-3. Successful testnet transaction
-4. The transaction result is shown to the user
+
+### 1. Initial State
+![Initial Landing Page](./public/intial-page.png)
+
+### 2. Wallet Connected & Balance Fetched
+![Connected Wallet State](./public/homepage-connected.png)
+
+### 3. Transaction Success Screen
+![Successful Transaction](./public/success.png)
+
+### 4. Verified on Stellar Expert Explorer
+![Stellar Explorer Screen](./public/explorer.png)
