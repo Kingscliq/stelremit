@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# StelRemit
+
+StelRemit is a simple, beautifully designed remittance application built on the Stellar Testnet. It demonstrates the core flow of connecting a Freighter wallet, viewing a real-time XLM balance, and sending payments seamlessly via the `stellar-sdk` and `@stellar/freighter-api`.
+
+**Level 1 Submission - Stellar x RiseIn Bootcamp**
+
+## Features
+
+- **Wallet Connection**: Prompt and connect the Freighter browser wallet.
+- **Balance Viewing**: Queries the Horizon testnet to dynamically display the connected account's native XLM balance.
+- **Transaction Submission**: Uses the `TransactionBuilder` to send Testnet XLM to any valid Stellar public key, authenticated right via the Freighter popup.
+- **Real-Time Feedback**: Displays immediate error handling and outputs successful transaction hashes with a direct link to Stellar Expert explorer.
+- **Beautiful UI**: Modern, responsive, dark-mode Tailwind v4 styling matching professional fintech standards.
+
+## Tech Stack
+
+- Next.js (App Router)
+- React
+- Tailwind CSS v4
+- `@stellar/stellar-sdk`
+- `@stellar/freighter-api`
 
 ## Getting Started
 
-First, run the development server:
+First, ensure you have the [Freighter Browser Extension](https://www.freighter.app/) installed and set to the **Testnet** network. Make sure your account has some testnet XLM (use the laboratory faucet if needed).
+
+To run the development server locally:
 
 ```bash
+# Install dependencies
+npm install
+
+# Start the dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Usage Guide
+1. **Connect**: Click "Connect Wallet" on the home page or navbar and approve the prompt in Freighter.
+2. **View Balance**: Once connected, you will see your truncated address and your current XLM balance fetched from Horizon.
+3. **Send XLM**: 
+   - Enter a valid testnet destination address.
+   - Enter an amount of XLM to send.
+   - Click "Send".
+4. **Sign**: Review and sign the transaction prompt in Freighter.
+5. **Success**: The app will display the transaction hash and update your balance upon success!
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Screenshots
+_Please add your local screenshots to the `public/` directory or README images folder here demonstrating:_
+1. Wallet connected state
+2. Balance displayed
+3. Successful testnet transaction
+4. The transaction result is shown to the user

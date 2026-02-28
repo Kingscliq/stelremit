@@ -1,6 +1,18 @@
-export function TransactionResult({ onSendAgain }: { onSendAgain: () => void }) {
+export function TransactionResult({ 
+  amount,
+  destination,
+  txHash,
+  onSendAgain 
+}: { 
+  amount: string;
+  destination: string;
+  txHash: string;
+  onSendAgain: () => void;
+}) {
+  const truncatedDest = destination ? `${destination.slice(0, 6)}...${destination.slice(-8)}` : "Unknown";
+
   return (
-    <div className="bg-surface border border-[rgba(62,207,142,0.2)] rounded-2xl py-8 px-6 text-center">
+    <div className="bg-surface border border-[rgba(62,207,142,0.2)] rounded-2xl py-8 px-6 text-center animate-fade-up">
       <div className="w-14 h-14 bg-green-dim border border-[rgba(62,207,142,0.25)] rounded-2xl flex items-center justify-center text-2xl mx-auto mb-5">
         ✓
       </div>
@@ -8,7 +20,7 @@ export function TransactionResult({ onSendAgain }: { onSendAgain: () => void }) 
         Transaction Sent
       </div>
       <div className="text-[0.82rem] text-muted mb-6 leading-relaxed font-light">
-        50 XLM has been sent to GXYZ9Q...4STELLAR on the Stellar testnet.
+        {amount} XLM has been sent to {truncatedDest} on the Stellar testnet.
       </div>
 
       <div className="bg-surface-2 border border-border-1 rounded-[10px] py-3 px-4 text-left mb-5">
@@ -16,7 +28,7 @@ export function TransactionResult({ onSendAgain }: { onSendAgain: () => void }) 
           Transaction Hash
         </div>
         <div className="font-mono text-[0.75rem] text-accent break-all leading-[1.6]">
-          a3f1e9b2d74c85a2f1e9b2d74c85a2f1e9b2d74c85a2f1e9b2d74c85a2f1e9b
+          {txHash}
         </div>
       </div>
 
@@ -27,11 +39,14 @@ export function TransactionResult({ onSendAgain }: { onSendAgain: () => void }) 
         >
           ← Send Again
         </button>
-        <button
-          className="font-sans text-[0.82rem] font-semibold text-accent bg-surface-2 border border-[rgba(79,123,255,0.3)] py-2.5 px-5 rounded-[10px] cursor-pointer transition-all duration-200 hover:bg-surface hover:border-[rgba(255,255,255,0.2)]"
+        <a
+          href={`https://stellar.expert/explorer/testnet/tx/${txHash}`}
+          target="_blank"
+          rel="noreferrer"
+          className="font-sans text-[0.82rem] font-semibold text-accent bg-surface-2 border border-[rgba(79,123,255,0.3)] py-2.5 px-5 rounded-[10px] cursor-pointer transition-all duration-200 hover:bg-surface hover:border-[rgba(255,255,255,0.2)] no-underline inline-block"
         >
           View on Stellar Expert ↗
-        </button>
+        </a>
       </div>
     </div>
   );

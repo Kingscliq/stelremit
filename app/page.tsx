@@ -1,47 +1,131 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { BalanceCard } from "@/components/BalanceCard";
 import { SendForm } from "@/components/SendForm";
 import { TransactionResult } from "@/components/TransactionResult";
+import { connectWallet, checkConnection } from "@/lib/freighter";
+import { fetchBalance, sendXlm } from "@/lib/stellar";
 
 type ViewState = "disconnected" | "connected" | "success";
 
 export default function Home() {
   const [viewState, setViewState] = useState<ViewState>("disconnected");
+  const [publicKey, setPublicKey] = useState("");
+  const [balance, setBalance] = useState("0");
+  
+  // UI loading states
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  // Sync navbar mock state
-  const isConnected = viewState !== "disconnected";
+  // Transaction details for success view
+  const [txHash, setTxHash] = useState("");
+  const [lastAmount, setLastAmount] = useState("");
+  const [lastDest, setLastDest] = useState("");
 
-  const handleConnectToggle = (val: boolean) => {
-    setViewState(val ? "connected" : "disconnected");
+  // On mount, check if already connected
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const address = await checkConnection();
+        if (address) {
+          setPublicKey(address);
+          setViewState("connected");
+          updateBalance(address);
+        }
+      } catch (e) {
+        console.error("Auto-connect failed", e);
+      }
+    };
+    init();
+  }, []);
+
+  const updateBalance = async (pubkey: string) => {
+    setIsRefreshing(true);
+    try {
+      const b = await fetchBalance(pubkey);
+      setBalance(b);
+    } catch (e) {
+      console.error(e);
+      // fallback handled gracefully in stealth
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const handleConnect = async () => {
+    setErrorMsg("");
+    setIsConnecting(true);
+    try {
+      const address = await connectWallet();
+      setPublicKey(address);
+      setViewState("connected");
+      updateBalance(address);
+    } catch (err: any) {
+      setErrorMsg(err.message || "Failed to connect wallet.");
+    } finally {
+      setIsConnecting(false);
+    }
+  };
+
+  const handleDisconnect = () => {
+    setPublicKey("");
+    setBalance("0");
+    setViewState("disconnected");
+    setErrorMsg("");
+  };
+
+  const handleSend = async (destination: string, amount: string) => {
+    setErrorMsg("");
+    setIsSending(true);
+    try {
+      const hash = await sendXlm(publicKey, destination, amount);
+      setTxHash(hash);
+      setLastAmount(amount);
+      setLastDest(destination);
+      setViewState("success");
+      // Pre-fetch balance for whenever they come back
+      updateBalance(publicKey);
+    } catch (err: any) {
+      setErrorMsg(err.message || "Transaction failed.");
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
     <>
-      <Navbar connected={isConnected} setConnected={handleConnectToggle} />
+      <Navbar 
+        publicKey={publicKey} 
+        isConnecting={isConnecting} 
+        onConnect={handleConnect} 
+      />
 
       <main className="relative z-[1] max-w-[480px] mx-auto pt-12 px-5 pb-20">
-        {/* DEMO TABS */}
-        <div className="flex gap-2 mb-8 bg-surface border border-border-1 rounded-xl p-1.5">
-          {(["disconnected", "connected", "success"] as ViewState[]).map((tab, idx) => (
-            <button
-              key={tab}
-              onClick={() => setViewState(tab)}
-              className={`flex-1 text-center text-[0.75rem] font-semibold py-2 px-2 rounded-lg border-none cursor-pointer font-sans transition-all duration-200 ${
-                viewState === tab
-                  ? "bg-surface-2 text-text-main border border-border-2 shadow-sm"
-                  : "bg-transparent text-muted hover:text-text-main"
-              }`}
-            >
-              {idx === 0 ? "① Disconnected" : idx === 1 ? "② Connected" : "③ Success"}
-            </button>
-          ))}
-        </div>
-        <div className="text-center text-[0.7rem] text-muted mb-5 opacity-60 italic">
-          ← UI mockup — click tabs to preview each state
-        </div>
+        
+        {/* Global Error Banner */}
+        {errorMsg && (
+          <div className="bg-surface border border-red rounded-xl p-4 mb-6 text-red text-[0.8rem] text-center animate-fade-up">
+            {errorMsg === "Freighter wallet not installed" ? (
+              <span>
+                Freighter wallet is not installed.{" "}
+                <a
+                  href="https://chromewebstore.google.com/detail/freighter/bcacfldlkkdogcmkkibnjlakofdplcbk"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline font-bold text-accent"
+                >
+                  Download the Chrome Extension here
+                </a>
+              </span>
+            ) : (
+              errorMsg
+            )}
+          </div>
+        )}
 
         {/* STATE: DISCONNECTED */}
         {viewState === "disconnected" && (
@@ -57,11 +141,12 @@ export default function Home() {
                 Fast, low-cost XLM transfers on the Stellar testnet. Connect your wallet to get started.
               </p>
               <button
-                onClick={() => setViewState("connected")}
-                className="font-sans text-[0.9rem] font-semibold text-white bg-accent border-none py-[14px] px-8 rounded-xl cursor-pointer transition-all duration-250 inline-flex items-center gap-2 shadow-[0_4px_24px_var(--color-accent-glow)] hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(79,123,255,0.35)] active:translate-y-0"
+                onClick={handleConnect}
+                disabled={isConnecting}
+                className="font-sans text-[0.9rem] font-semibold text-white bg-accent border-none py-[14px] px-8 rounded-xl cursor-pointer transition-all duration-250 inline-flex items-center gap-2 shadow-[0_4px_24px_var(--color-accent-glow)] hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(79,123,255,0.35)] active:translate-y-0 disabled:opacity-75 disabled:cursor-not-allowed"
               >
-                Connect Freighter Wallet
-                <span className="text-[1rem]">→</span>
+                {isConnecting ? "Connecting..." : "Connect Freighter Wallet"}
+                {!isConnecting && <span className="text-[1rem]">→</span>}
               </button>
               <div className="flex justify-center gap-8 mt-14 pt-8 border-t border-border-1">
                 <div className="text-center">
@@ -84,15 +169,32 @@ export default function Home() {
         {/* STATE: CONNECTED */}
         {viewState === "connected" && (
           <div className="animate-fade-up">
-            <BalanceCard />
-            <SendForm onSuccess={() => setViewState("success")} />
+            <BalanceCard 
+              balance={balance} 
+              publicKey={publicKey} 
+              onDisconnect={handleDisconnect}
+              onRefresh={() => updateBalance(publicKey)}
+              isRefreshing={isRefreshing}
+            />
+            <SendForm 
+              onSend={handleSend}
+              isSending={isSending}
+            />
           </div>
         )}
 
         {/* STATE: SUCCESS */}
         {viewState === "success" && (
           <div className="animate-fade-up">
-            <TransactionResult onSendAgain={() => setViewState("connected")} />
+            <TransactionResult 
+              amount={lastAmount}
+              destination={lastDest}
+              txHash={txHash}
+              onSendAgain={() => {
+                setViewState("connected");
+                setTxHash("");
+              }} 
+            />
           </div>
         )}
       </main>
