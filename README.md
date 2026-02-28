@@ -57,5 +57,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ### 3. Transaction Success Screen
 ![Successful Transaction](./public/success.png)
 
-### 4. Verified on Stellar Expert Explorer
+### 4. Receiver's Updated Balance
+![Receiver Balance](./public/receivers-balance.png)
+
+### 5. Verified on Stellar Expert Explorer
 ![Stellar Explorer Screen](./public/explorer.png)
