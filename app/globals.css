@@ -1,26 +1,68 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: #080d1a;
+  --color-surface: #0e1628;
+  --color-surface-2: #141d32;
+  --color-border-1: rgba(255, 255, 255, 0.07);
+  --color-border-2: rgba(255, 255, 255, 0.12);
+  --color-text-main: #e8edf7;
+  --color-muted: #6b7a99;
+  --color-accent: #4f7bff;
+  --color-accent-glow: rgba(79, 123, 255, 0.18);
+  --color-gold: #f0c060;
+  --color-gold-dim: rgba(240, 192, 96, 0.12);
+  --color-green: #3ecf8e;
+  --color-green-dim: rgba(62, 207, 142, 0.1);
+  --color-red: #f87171;
+
+  --font-sans: var(--font-sora);
+  --font-mono: var(--font-dm-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --bg: #080d1a;
+  --text: #e8edf7;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+/* Background stars / noise effect */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgba(255, 255, 255, 0.25) 0%, transparent 100%),
+    radial-gradient(1px 1px at 34% 72%, rgba(255, 255, 255, 0.2) 0%, transparent 100%),
+    radial-gradient(1px 1px at 58% 31%, rgba(255, 255, 255, 0.15) 0%, transparent 100%),
+    radial-gradient(1px 1px at 78% 88%, rgba(255, 255, 255, 0.2) 0%, transparent 100%),
+    radial-gradient(1px 1px at 91% 14%, rgba(255, 255, 255, 0.25) 0%, transparent 100%),
+    radial-gradient(1px 1px at 23% 54%, rgba(255, 255, 255, 0.15) 0%, transparent 100%),
+    radial-gradient(1px 1px at 67% 61%, rgba(255, 255, 255, 0.1) 0%, transparent 100%),
+    radial-gradient(600px 400px at 20% 10%, rgba(79, 123, 255, 0.06) 0%, transparent 70%),
+    radial-gradient(400px 300px at 80% 80%, rgba(240, 192, 96, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.4s ease both;
 }
